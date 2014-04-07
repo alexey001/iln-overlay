@@ -1,0 +1,140 @@
+diff -Nur SConstruct SConstruct
+--- SConstruct	2012-11-14 12:10:52.229481799 +0100
++++ SConstruct	2012-11-14 12:16:21.849788474 +0100
+@@ -110,6 +110,10 @@
+                   map={}, ignorecase=2),
+     PathVariable('prefix', 'Install prefix',
+                  '/usr/local/xorp', PathVariable.PathAccept),
++    PathVariable('xorp_conf_path', 'Install prefix',
++                 '/usr/local/xorp/etc/xorp', PathVariable.PathAccept),
++    PathVariable('xorp_prefix', 'Installation prefix',
++                 '/usr/local/xorp', PathVariable.PathAccept),
+     )
+
+ def log_args(afname):
+@@ -383,6 +387,8 @@
+ env['xorp_tooldir']     = env['libdir']  + '/xorp/bin'	# tools/*
+ env['xorp_xrlsdir']     = env['datadir'] + '/xrl/targets'	# *.xrls
+ env['xorp_sourcedir']   = sourcedir	# rtrmgr/util.cc and xif need this
++env['xorp_conf_path']   = ARGUMENTS.get('xorp_conf_path')
++env['xorp_prefix']      = ARGUMENTS.get('xorp_prefix')
+ 
+ tst = ARGUMENTS.get('enable_boost', False)
+ if tst and not (tst == "no"):
+diff -Nur rtrmgr/SConscript rtrmgr/SConscript
+--- rtrmgr/SConscript	2012-11-13 21:59:12.305317561 +0100
++++ rtrmgr/SConscript	2012-11-13 23:00:17.526738570 +0100
+@@ -112,6 +112,8 @@
+     "XORP_INSTALL_ROOT" : '\\"' + str(env['prefix']) + '\\"',
+     "XORP_BUILD_ROOT"   : '\\"' + str(env['BUILDDIR']) + '\\"',
+     "XORP_SRC_ROOT"     : '\\"' + str(env['xorp_sourcedir']) + '\\"',
++    "XORP_PREFIX"       : '\\"' + str(env['xorp_prefix']) + '\\"',
++    "XORP_CONF_PATH"    : '\\"' + str(env['xorp_conf_path']) + '\\"',
+ }
+ 
+ 
+diff -Nur rtrmgr/util.hh rtrmgr/util.hh
+--- rtrmgr/util.hh	2012-11-13 23:55:18.033580053 +0100
++++ rtrmgr/util.hh	2012-11-13 23:55:37.279953465 +0100
+@@ -50,7 +50,7 @@
+  * @ref xorp_path_init() must be called before this method will return a sane
+  * value.
+  */
+-const string& xorp_binary_root_dir();
++string xorp_binary_root_dir();
+
+ /**
+  * Return top-level directory of xorp configuration files.
+diff -Nur rtrmgr/util.cc rtrmgr/util.cc
+--- rtrmgr/util.cc	2012-11-13 21:59:06.624329764 +0100
++++ rtrmgr/util.cc	2012-11-13 23:11:18.680892384 +0100
+@@ -37,7 +37,7 @@
+ #endif
+ 
+ static string s_cfg_root;
+-static string s_bin_root;
++static string s_prefix_root;
+ static string s_config_file;
+ 
+ /**
+@@ -128,7 +128,7 @@
+ {
+     const char* xr = getenv("XORP_ROOT");
+     if (xr != NULL) {
+-	s_bin_root = xr;
++	s_prefix_root = xr;
+ 	s_cfg_root = xr;
+ 	s_config_file = s_cfg_root + "/etc/xorp.conf";
+ 	return;
+@@ -144,31 +144,32 @@
+     string build_root = xorp_real_path(XORP_BUILD_ROOT);
+     debug_msg("build_root:   %s\n", build_root.c_str());
+     if (current_root == build_root) {
+-	s_bin_root = build_root;
++	s_prefix_root = build_root;
+ 	s_cfg_root = xorp_real_path(XORP_SRC_ROOT);
+ 	s_config_file = s_cfg_root + "/rtrmgr/xorp.conf";
+ 
+-	debug_msg("s_bin_root:   %s\n", s_bin_root.c_str());
++	debug_msg("s_prefix_root:   %s\n", s_prefix_root.c_str());
+ 	debug_msg("s_cfg_root:   %s\n", s_cfg_root.c_str());
+ 	debug_msg("s_config_file:  %s\n", s_config_file.c_str());
+ 
+ 	return;
+     }
+ 
+-    string install_root = xorp_real_path(XORP_INSTALL_ROOT);
+-    s_bin_root = install_root;
+-    s_cfg_root = install_root;
+-    s_config_file = s_cfg_root + "/etc/xorp.conf";
++    string exec_root = xorp_real_path(XORP_PREFIX);
++    s_prefix_root = exec_root;
++    string config_root = xorp_real_path(XORP_CONF_PATH);
++    s_cfg_root = config_root;
++    s_config_file = s_cfg_root + "/xorp.conf";
+ 
+-    debug_msg("s_bin_root:   %s\n", s_bin_root.c_str());
++    debug_msg("s_prefix_root:   %s\n", s_prefix_root.c_str());
+     debug_msg("s_cfg_root:   %s\n", s_cfg_root.c_str());
+     debug_msg("s_config_file:  %s\n", s_config_file.c_str());
+ }
+
+-const string&
++string
+ xorp_binary_root_dir()
+ {
+-    return s_bin_root;
++    return s_prefix_root + string("/sbin");
+ }
+ 
+ const string&
+@@ -180,25 +181,25 @@
+ string
+ xorp_module_dir()
+ {
+-    return s_cfg_root + string("/lib/xorp/sbin");
++    return s_prefix_root + string("/lib/xorp/sbin");
+ }
+ 
+ string
+ xorp_command_dir()
+ {
+-    return s_cfg_root + string("/lib/xorp/bin");
++    return s_prefix_root + string("/lib/xorp/bin");
+ }
+ 
+ string
+ xorp_template_dir()
+ {
+-    return s_cfg_root + string("/share/xorp/templates");
++    return s_prefix_root + string("/share/xorp/templates");
+ }
+ 
+ string
+ xorp_xrl_targets_dir()
+ {
+-    return s_cfg_root + string("/share/xorp/xrl/targets");
++    return s_prefix_root + string("/share/xorp/xrl/targets");
+ }
+ 
+ string

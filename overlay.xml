@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE repositories SYSTEM "/dtd/repositories.dtd">
+<repositories xmlns="" version="1.0">
+  <repo quality="experimental" status="unofficial">
+    <name>iln</name>
+    <description>Ebuilds for misc network tools</description>
+    <homepage>https://github.com/alexey001/iln-overlay</homepage>
+    <owner>
+      <email>alexey001@gmail.com</email>
+      <name>Alexey Pozhilkov</name>
+    </owner>
+    <source type="git">git://github.com:alexey001/iln-overlay.git</source>
+    <source type="git">https://github.com/alexey001/iln-overlay.git</source>
+  </repo>
+</repositories>
+

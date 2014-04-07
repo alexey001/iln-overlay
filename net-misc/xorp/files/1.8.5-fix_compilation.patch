@@ -1,0 +1,10 @@
+--- SConstruct	2012-01-11 18:46:45.000000000 +0100
++++ SConstruct	2012-05-13 01:53:48.155400071 +0200
+@@ -997,6 +997,7 @@
+             # Tell rtld to turn on $ORIGIN processing by default.
+             # NOTE: GNU ld specific flag.
+             env.PrependUnique( LINKFLAGS = [ '-Wl,-z,origin' ] )
++            env.AppendUnique( RPATH = '\\$$$$ORIGIN' )
+ 
+ 	# Set relative RPATH for each kind of installed XORP component.
+ 	env['xorp_sbin_rpath'] = os.path.join('\\$$ORIGIN',
