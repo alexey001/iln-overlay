@@ -1,0 +1,11 @@
+--- lib/rt_names.c
++++ lib/rt_names.c
+@@ -307,7 +307,7 @@ int rtnl_rtrealm_a2n(__u32 *id, const char *arg)
+ 	}
+ 
+ 	res = strtoul(arg, &end, 0);
+-	if (!end || end == arg || *end || res > 255)
++	if (!end || end == arg || *end || res > 65535)
+ 		return -1;
+ 	*id = res;
+ 	return 0;
