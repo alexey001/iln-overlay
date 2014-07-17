@@ -1,0 +1,11 @@
+--- configure.ac.orig	2014-01-12 09:14:46.375505041 +0100
++++ configure.ac	2014-01-12 09:15:00.884754954 +0100
+@@ -6,7 +6,7 @@
+ AC_CONFIG_SRCDIR([configure.ac])
+ AC_CONFIG_AUX_DIR([config])
+ AC_CONFIG_HEADERS([src/config.h])
+-AM_INIT_AUTOMAKE([-Wall -Werror -Wno-portability])
++AM_INIT_AUTOMAKE([-Wall -Werror -Wno-portability subdir-objects])
+ AC_CANONICAL_HOST
+ AM_PROG_CC_C_O
+ AC_GNU_SOURCE

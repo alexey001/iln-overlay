@@ -1,0 +1,12 @@
+--- a/src/lua-lxc/lxc.lua	2014-01-12 15:02:45.000000000 +0100
++++ b/src/lua-lxc/lxc.lua	2014-01-12 15:06:42.258772882 +0100
+@@ -88,6 +88,9 @@
+ 	while true do
+ 	    local c
+ 	    line = f:read()
++	    if (not line) then
++	        break
++	    end
+ 	    c = line:split(" ", 6)
+ 	    if (c[1] == "cgroup") then
+ 		cgroup_path = dirname(c[2])
