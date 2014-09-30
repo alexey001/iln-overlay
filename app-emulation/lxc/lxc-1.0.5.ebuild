@@ -25,7 +25,7 @@ fi
 
 [[ "${PV}" == "0.9.0" ]] && use_usleep="sys-apps/usleep"
 
-KEYWORDS="~amd64 ~arm ~ppc64 ~x86"
+KEYWORDS="amd64 ~arm ~ppc64 x86"
 
 LICENSE="LGPL-3"
 SLOT="0"

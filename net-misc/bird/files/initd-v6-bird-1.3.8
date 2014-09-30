@@ -24,7 +24,7 @@ checkconfig() {
 start() {
 	checkconfig || return $?
 	ebegin "Starting BIRD"
-	start-stop-daemon --start --exec /usr/sbin/${EXE} -- -c "/etc/${EXE}.conf" -s "${SOCK}"
+	start-stop-daemon --start --exec /usr/sbin/${EXE} -- -c "/etc/${EXE}.conf" -s "${SOCK} -u {BIRD_USER}"
 	eend $? "Failed to start BIRD"
 }
 
